@@ -1,4 +1,11 @@
+
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sqlite_camera_flutter_app/models/place.dart';
+import 'package:sqlite_camera_flutter_app/providers/great_places.dart';
 import 'package:sqlite_camera_flutter_app/widgets/image_input.dart';
 
 class AddPlaceScreen extends StatefulWidget {
@@ -10,6 +17,19 @@ class AddPlaceScreen extends StatefulWidget {
 
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
+  File? _pickedImage;
+
+  void _selectImage(File pickedImage){
+      _pickedImage=pickedImage;
+  }
+
+  void _savePlace(){
+    if(_titleController.text.isEmpty || _pickedImage==null){
+      return;
+    }
+    Provider.of<GreatPlaces>(context,listen: false).addPlace(_titleController.text,_pickedImage!);
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +51,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                       controller: _titleController,
                     ),
                     const SizedBox(height: 10,),
-                    const ImageInput()
+                    ImageInput(_selectImage)
                   ],
                 ),
               ),
@@ -42,7 +62,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
               Icons.add,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed: _savePlace,
             label: const Text(
               "Add place",
               style: TextStyle(color: Colors.black54),
